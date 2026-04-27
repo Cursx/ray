@@ -1566,35 +1566,31 @@ class TestMultiAgentEpisode(unittest.TestCase):
         result = episode.get_extra_model_outputs(
             key="vf_preds", indices=[-1, -2], env_steps=True,
         )
-        if "a0" in result:
-            val = result["a0"]
-            if isinstance(val, list):
-                for item in val:
-                    self.assertNotIsInstance(item, dict)
+        self.assertIn("a0", result)
+        check(result["a0"], [0.7, 0.5])
+        check(result["a1"], [0.8, 0.6])
 
         # Slice indices -> _get_single_agent_data_by_env_step_indices.
         result = episode.get_extra_model_outputs(
             key="vf_preds", indices=slice(-2, None), env_steps=True,
         )
-        if "a0" in result:
-            val = result["a0"]
-            if isinstance(val, list):
-                for item in val:
-                    self.assertNotIsInstance(item, dict)
+        self.assertIn("a0", result)
+        check(result["a0"], [0.5, 0.7])
+        check(result["a1"], [0.6, 0.8])
 
         # Single int index -> _get_single_agent_data_by_index.
         result = episode.get_extra_model_outputs(
             key="vf_preds", indices=-1, env_steps=True,
         )
-        if "a0" in result:
-            self.assertNotIsInstance(result["a0"], dict)
+        self.assertIn("a0", result)
+        check(result["a0"], 0.7)
+        check(result["a1"], 0.8)
 
         # Control: agent_steps path (already correct).
         result = episode.get_extra_model_outputs(
             key="vf_preds", indices=-1, env_steps=False, agent_ids="a0",
         )
         self.assertIn("a0", result)
-        self.assertNotIsInstance(result["a0"], dict)
         check(result["a0"], 0.7)
 
     def test_other_getters(self):
